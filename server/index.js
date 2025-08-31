@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(cors({
   origin: [
     "http://localhost:5173",               // local dev
-    "https://craveit-frontend.onrender.com" // deployed frontend
+    "https://craveit-app-frontend.onrender.com" // deployed frontend
   ],
   credentials: true, // allow cookies
 }));
