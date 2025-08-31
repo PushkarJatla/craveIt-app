@@ -32,13 +32,16 @@ app.use(
     secret: process.env.SESSION_SECRET || "supersecretkey",
     resave: false,
     saveUninitialized: false,
+    proxy: true, // 👈 important on Render (behind proxy)
     cookie: {
-      secure: process.env.NODE_ENV === "production", // true if https
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: true, // 👈 must be true on HTTPS
+      httpOnly: true,
+      sameSite: "none", // 👈 allow cross-origin cookies
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
 );
+
 
 // DB connection
 connectDB();
