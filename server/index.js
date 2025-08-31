@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(cors({
   origin: [
     "http://localhost:5173",               // local dev
-    "https://crave-it-app.vercel.app/" // deployed frontend
+    "https://crave-it-app.vercel.app" // deployed frontend
   ],
   credentials: true, // allow cookies
 }));
