@@ -11,7 +11,7 @@ export default function LocationInput({ location, loading, onLocationChange, onF
         type="text"
         value={location}
         onChange={(e) => onLocationChange(e.target.value)}
-        placeholder="get nearby vendors by location"
+        placeholder="Get nearby vendors by location"
         className="flex-1 border-none outline-none text-gray-700 text-sm bg-white"
       />
 
