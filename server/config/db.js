@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
+const dotenv =require("dotenv");
 
+dotenv.config();
 const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb+srv://pushkarjatla03:pushkarjatla1704@cluster0.7a868ww.mongodb.net/foodie", {
+    await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
     });
     console.log("✅ MongoDB Connected...");
