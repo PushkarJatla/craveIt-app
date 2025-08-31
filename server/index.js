@@ -19,7 +19,7 @@ app.use("/uploads", express.static("public/uploads"));
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://craveit-frontend.onrender.com",
   credentials: true,
 }));
 
