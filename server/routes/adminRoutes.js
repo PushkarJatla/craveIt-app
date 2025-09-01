@@ -92,7 +92,7 @@ router.patch("/vendor-applications/:id/approve", auth(["admin"]), async (req, re
     await sendMail(
       user.email,
       "CraveIt : Your Vendor Application Has Been Approved",
-      `<p>Hello <strong>${user.name}</strong>,</p>
+      `<p>Hello <strong>${user.username}</strong>,</p>
        <p>Congratulations! Your vendor application for <strong>${app.name}</strong> has been <span style="color:green;font-weight:bold;">approved</span>.</p>
        <p>You can now log in to your account and start managing your vendor profile.</p>
        <p>Best regards,<br/>Team CraveIt</p>`
