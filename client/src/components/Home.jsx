@@ -182,7 +182,7 @@ export default function HomePage() {
 
   const displayedNearest = showAllNearest
     ? nearestVendors
-    : nearestVendors.slice(0, 2);
+    : nearestVendors.slice(0, 3);
 
 
 
