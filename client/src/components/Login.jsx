@@ -3,12 +3,15 @@ import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { LogIn } from "lucide-react";
 import toast from "react-hot-toast";
+import Spinner from "./Spinner";
 
 const Login = ({ setUser }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  const [loading, setLoading] = useState(false);
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
@@ -19,6 +22,7 @@ const Login = ({ setUser }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const res = await axios.post(
@@ -33,6 +37,8 @@ const Login = ({ setUser }) => {
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.msg || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,9 +90,11 @@ const Login = ({ setUser }) => {
 
           <button
             type="submit"
-            className="w-full bg-orange-600 text-white font-semibold py-2 sm:py-3 rounded-lg hover:bg-orange-700 transition text-sm sm:text-base"
+            disabled={loading}
+            className={`w-full flex items-center justify-center bg-orange-600 text-white font-semibold py-2 sm:py-3 rounded-lg hover:bg-orange-700 transition text-sm sm:text-base ${loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
           >
-            Login
+            {loading ? <Spinner className="text-white" /> : "Login"}
           </button>
         </form>
 

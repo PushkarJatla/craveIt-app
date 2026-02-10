@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import Spinner from "./Spinner";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const Signup = () => {
   });
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
+  const [loading, setLoading] = useState(false);
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
@@ -58,16 +60,19 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     toast.loading("Processing...");
+    setLoading(true);
 
     if (!validateUsername(formData.username)) {
       toast.dismiss();
       toast.error("Please enter a valid username.");
+      setLoading(false);
       return;
     }
 
     if (!validatePassword(formData.password)) {
       toast.dismiss();
       toast.error("Please enter a valid password.");
+      setLoading(false);
       return;
     }
 
@@ -84,6 +89,8 @@ const Signup = () => {
       console.error(err);
       toast.dismiss();
       toast.error(err.response?.data?.msg || "Signup failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -141,9 +148,11 @@ const Signup = () => {
 
           <button
             type="submit"
-            className="w-full bg-orange-600 text-white font-semibold py-2 rounded-lg hover:bg-orange-700 transition"
+            disabled={loading}
+            className={`w-full flex items-center justify-center bg-orange-600 text-white font-semibold py-2 rounded-lg hover:bg-orange-700 transition ${loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
           >
-            Sign Up
+            {loading ? <Spinner className="text-white" /> : "Sign Up"}
           </button>
         </form>
 
