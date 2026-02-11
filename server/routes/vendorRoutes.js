@@ -11,8 +11,14 @@ const auth = require("../middlewares/authMiddleware");
 // Public route - fetch only approved vendor applications
 router.get("/vendor-applications", async (req, res) => {
   try {
+    const limit = parseInt(req.query.limit) || 6;
+    const skip = parseInt(req.query.skip) || 0;
+
     const apps = await VendorApplication.find({ status: "approved" })
-      .populate("user", "username email role");
+      .populate("user", "username email role")
+      .skip(skip)
+      .limit(limit);
+
     res.json(apps);
   } catch (err) {
     res.status(500).json({ error: err.message });

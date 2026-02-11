@@ -7,6 +7,7 @@ import LocationInput from "./LocationInput";
 import FoodSearchInput from "./FoodSearchInput";
 import foodCategories from "../data/foodCategories";
 import FoodCategoriesMarquee from "./FoodCategoriesMarquee";
+import Spinner from "./Spinner";
 
 const OPENCAGE_API_KEY = import.meta.env.VITE_OPENCAGE_API_KEY;
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -23,6 +24,13 @@ export default function HomePage() {
 
 
   const [suggestions, setSuggestions] = useState([]);
+
+  // Pagination State
+  const [skip, setSkip] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadingVendors, setLoadingVendors] = useState(false);
+  const [isFiltered, setIsFiltered] = useState(false);
 
   function debounce(func, delay) {
     let timer;
@@ -94,20 +102,57 @@ export default function HomePage() {
     fetchUser();
   }, []);
 
-  useEffect(() => {
-    const fetchVendorApps = async () => {
-      try {
-        const res = await axios.get(`${BACKEND_URL}/vendors/vendor-applications`);
-        setAllVendors(res.data);
-        setApps(res.data);  // initially show all
-      } catch (error) {
-        console.error("Failed to fetch vendor applications:", error);
+  const fetchVendors = async (skipValue = 0, limit = 6, isInitial = false) => {
+    try {
+      if (isInitial) setLoadingVendors(true);
+      else setLoadingMore(true);
+
+      const res = await axios.get(`${BACKEND_URL}/vendors/vendor-applications?skip=${skipValue}&limit=${limit}`);
+      const newVendors = res.data;
+
+      if (newVendors.length < limit) setHasMore(false);
+
+      if (isInitial) {
+        setAllVendors(newVendors);
+        setApps(newVendors);
+      } else {
+        setAllVendors((prev) => [...prev, ...newVendors]);
+        setApps((prev) => [...prev, ...newVendors]);
       }
-    };
-    fetchVendorApps();
+    } catch (error) {
+      console.error("Failed to fetch vendor applications:", error);
+    } finally {
+      if (isInitial) setLoadingVendors(false);
+      else setLoadingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    // Initial fetch
+    fetchVendors(0, 6, true);
+    setSkip(6);
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop + 1 >=
+        document.documentElement.scrollHeight &&
+        hasMore &&
+        !loadingMore &&
+        !isFiltered
+      ) {
+        fetchVendors(skip, 6, false);
+        setSkip((prev) => prev + 6);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasMore, loadingMore, skip, isFiltered]);
+
   const handleCategoryClick = async (category) => {
+    setIsFiltered(true);
     if (!category || !category.trim()) return;
 
     try {
@@ -183,7 +228,7 @@ export default function HomePage() {
   const displayedNearest = showAllNearest
     ? nearestVendors
     : nearestVendors.slice(0, 3);
-    
+
 
 
 
@@ -227,7 +272,18 @@ export default function HomePage() {
           </div>
         )}
 
-        <VendorsList apps={apps} />
+        {loadingVendors ? (
+          <div className="flex justify-center mt-10">
+            <Spinner size={40} className="text-orange-600" />
+          </div>
+        ) : (
+          <VendorsList apps={apps} />
+        )}
+        {loadingMore && (
+          <div className="flex justify-center my-4">
+            <Spinner size={30} className="text-orange-600" />
+          </div>
+        )}
       </main>
 
       <div className="fixed bottom-4 right-4">
