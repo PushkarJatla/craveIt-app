@@ -234,54 +234,87 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-orange-50">
-      <main className="flex-grow flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 py-6 max-w-6xl mx-auto w-full">
-        <h1 className="text-2xl md:text-3xl font-bold text-orange-800 mb-4 text-center">
-          📍 Crave Near Me
-        </h1>
-        <div className="w-full flex flex-col md:flex-row gap-4 mt-4 mb-6">
-          <LocationInput
-            location={location}
-            loading={loading}
-            onLocationChange={setLocation}
-            onFetchLocation={handleLocationFetch}
-            onSearch={handleAddressSearch}
-          />
-
-          <FoodSearchInput
-            food={food}
-            suggestions={suggestions}
-            onFoodChange={handleFoodChange}
-            onSearch={handleCategoryClick}
-            setFood={setFood}
-            setSuggestions={setSuggestions}
-          />
+      <main className="flex-grow flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 py-10 max-w-7xl mx-auto w-full space-y-12">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 tracking-tight">
+            📍 <span className="gradient-text">Crave Near You</span>
+          </h1>
+          <p className="text-gray-500 text-lg max-w-xl mx-auto font-medium">
+            Discover the best street food and hidden gems in your neighborhood.
+          </p>
         </div>
-        <FoodCategoriesMarquee
-          foodCategories={foodCategories}
-          onCategoryClick={handleCategoryClick}
-        />
-        <NearestVendorsList vendors={displayedNearest} />
-        {nearestVendors.length > 2 && (
-          <div className="text-center mt-2">
-            <button
-              onClick={() => setShowAllNearest((prev) => !prev)}
-              className="text-orange-600 font-medium hover:underline"
-            >
-              {showAllNearest ? "Show Less" : "View all nearby vendors"}
-            </button>
-          </div>
-        )}
 
-        {loadingVendors ? (
-          <div className="flex justify-center mt-10">
-            <Spinner size={40} className="text-orange-600" />
+        <div className="w-full glass-card !p-6 md:!p-10 space-y-6 shadow-2xl shadow-orange-200/40">
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-1">
+              <label className="block text-sm font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Current Location</label>
+              <LocationInput
+                location={location}
+                loading={loading}
+                onLocationChange={setLocation}
+                onFetchLocation={handleLocationFetch}
+                onSearch={handleAddressSearch}
+              />
+            </div>
+
+            <div className="flex-1">
+              <label className="block text-sm font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">What's on your mind?</label>
+              <FoodSearchInput
+                food={food}
+                suggestions={suggestions}
+                onFoodChange={handleFoodChange}
+                onSearch={handleCategoryClick}
+                setFood={setFood}
+                setSuggestions={setSuggestions}
+              />
+            </div>
           </div>
-        ) : (
-          <VendorsList apps={apps} />
-        )}
+
+          <div className="pt-4 border-t border-orange-50">
+            <FoodCategoriesMarquee
+              foodCategories={foodCategories}
+              onCategoryClick={handleCategoryClick}
+            />
+          </div>
+        </div>
+
+        <div className="w-full space-y-8">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800">
+              Nearest <span className="text-orange-600">Vendors</span>
+            </h2>
+            {nearestVendors.length > 3 && (
+              <button
+                onClick={() => setShowAllNearest((prev) => !prev)}
+                className="text-orange-600 font-bold hover:bg-orange-100 px-4 py-2 rounded-xl transition"
+              >
+                {showAllNearest ? "Show Less" : "View All"}
+              </button>
+            )}
+          </div>
+
+          <NearestVendorsList vendors={displayedNearest} />
+        </div>
+
+        <div className="w-full space-y-8">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800">
+              All <span className="text-orange-600">Hidden Gems</span>
+            </h2>
+          </div>
+
+          {loadingVendors ? (
+            <div className="flex justify-center py-20">
+              <Spinner size={48} className="text-orange-600 animate-spin" />
+            </div>
+          ) : (
+            <VendorsList apps={apps} />
+          )}
+        </div>
+
         {loadingMore && (
-          <div className="flex justify-center my-4">
-            <Spinner size={30} className="text-orange-600" />
+          <div className="flex justify-center py-8">
+            <Spinner size={32} className="text-orange-600 animate-spin" />
           </div>
         )}
       </main>

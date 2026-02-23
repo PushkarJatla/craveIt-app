@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
+import { LogOut, LayoutDashboard, UtensilsCrossed } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -54,141 +55,167 @@ const Navbar = ({ user, setUser }) => {
     }
   };
 
+  const navLinks = [
+    { name: "Services", path: "/services" },
+    { name: "About Us", path: "/about" },
+    { name: "Contact", path: "/contact-us" },
+  ];
+
   return (
-    <header className="bg-orange-50  sticky top-0 z-50 w-full">
-      <nav className="flex items-center justify-between px-4 md:px-6 py-3 max-w-screen-xl w-full mx-auto">
+    <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 w-full border-b border-orange-100 shadow-sm">
+      <nav className="flex items-center justify-between px-6 md:px-12 py-4 max-w-screen-2xl w-full mx-auto">
         {/* Logo */}
         <NavLink
-          to="/home"
-          className="flex items-center font-bold text-orange-600 gap-1 sm:gap-2"
+          to="/"
+          className="flex items-center font-extrabold text-orange-600 gap-2 group transition-transform hover:scale-[1.02]"
         >
-          {/* Logo Icon */}
-          <img
-            src="/favicon-32x32.png"
-            alt="CraveIt Logo"
-            className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7"
-          />
-
-          {/* Brand Text */}
-          <span className="text-lg sm:text-xl md:text-2xl lg:text-3xl">
+          <div className="bg-orange-600 p-1.5 rounded-xl shadow-lg shadow-orange-200">
+            <UtensilsCrossed size={20} className="text-white" />
+          </div>
+          <span className="text-2xl md:text-3xl font-heading tracking-tight">
             CraveIt
           </span>
         </NavLink>
 
 
         {/* Desktop Links */}
-        <div className="hidden md:flex items-center space-x-6 text-gray-700 font-medium">
-          <NavLink to="/services" className="hover:text-orange-600 transition">
-            Services
-          </NavLink>
-          
-          <NavLink to="/about" className="hover:text-orange-600 transition">
-            About Us
-          </NavLink>
-          <NavLink to="/contact-us" className="hover:text-orange-600 transition">
-            Contact
-          </NavLink>
+        <div className="hidden md:flex items-center space-x-8 text-gray-600 font-semibold">
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.name}
+              to={link.path}
+              className={({ isActive }) =>
+                `hover:text-orange-600 transition-colors duration-200 relative py-1
+                ${isActive ? "text-orange-600 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-orange-600 after:rounded-full" : ""}`
+              }
+            >
+              {link.name}
+            </NavLink>
+          ))}
+
           {user?.role === "admin" && (
-            <NavLink to="/dashboard" className="hover:text-orange-600 transition">
+            <NavLink
+              to="/dashboard"
+              className="flex items-center gap-1.5 bg-orange-50 text-orange-700 px-4 py-2 rounded-xl hover:bg-orange-100 transition-colors"
+            >
+              <LayoutDashboard size={18} />
               Dashboard
             </NavLink>
           )}
         </div>
 
+        {/* Action Buttons (Desktop) */}
+        <div className="hidden md:flex items-center gap-4">
+          <NavLink
+            to="/home"
+            className="text-gray-700 font-bold hover:text-orange-600 transition-colors"
+          >
+            Explore
+          </NavLink>
+
+          <div className="relative" ref={dropdownRef}>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-2 focus:outline-none rounded-2xl bg-gray-50 hover:bg-gray-100 p-2 border border-gray-100 transition-all"
+                >
+                  <FaUserCircle className="text-2xl text-gray-500" />
+                  <span className="font-bold text-gray-700 max-w-[100px] truncate">
+                    {user?.username}
+                  </span>
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-orange-100 rounded-2xl shadow-2xl py-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-5 py-3 hover:bg-gray-50 text-red-600 text-sm font-bold flex items-center gap-3 transition-colors"
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <NavLink
+                to="/login"
+                className="px-6 py-2.5 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-all font-bold shadow-lg shadow-orange-200"
+              >
+                Login
+              </NavLink>
+            )}
+          </div>
+        </div>
+
         {/* Mobile Hamburger */}
-        <div className="md:hidden flex items-center gap-2">
+        <div className="md:hidden flex items-center gap-4">
+          {user && (
+            <div className="font-bold text-gray-700 text-sm">
+              Hey, {user.username}!
+            </div>
+          )}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="text-gray-700 text-2xl focus:outline-none"
+            className="text-gray-700 text-2xl focus:outline-none hover:text-orange-600 transition-colors"
           >
             {menuOpen ? <FaTimes /> : <FaBars />}
           </button>
-        </div>
-
-        {/* User / Login (Desktop) */}
-        <div className="ml-4 relative hidden md:flex" ref={dropdownRef}>
-          {user ? (
-            <div className="flex items-center gap-2 relative">
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2 focus:outline-none rounded-full hover:bg-gray-100 p-1"
-              >
-
-                <span className="hidden sm:block font-medium text-gray-700 truncate max-w-[120px]">
-                  {user?.username}
-                </span>
-                <FaUserCircle className="text-2xl text-gray-700" />
-              </button>
-
-              {dropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700 text-sm font-medium rounded"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <NavLink
-              to="/login"
-              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-medium"
-            >
-              Login
-            </NavLink>
-          )}
         </div>
       </nav>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200 shadow-lg pb-1">
+        <div className="md:hidden bg-white border-t border-orange-50 shadow-2xl p-4 space-y-2 absolute w-full left-0 animate-in slide-in-from-top-4 duration-300">
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.name}
+              to={link.path}
+              onClick={() => setMenuOpen(false)}
+              className="block px-4 py-3 hover:bg-orange-50 rounded-xl transition-colors font-semibold text-gray-700"
+            >
+              {link.name}
+            </NavLink>
+          ))}
+
           <NavLink
-            to="/services"
+            to="/home"
             onClick={() => setMenuOpen(false)}
-            className="block px-6 py-3 hover:bg-gray-100 transition"
+            className="block px-4 py-3 hover:bg-orange-50 rounded-xl transition-colors font-semibold text-orange-600"
           >
-            Services
+            Explore Food
           </NavLink>
-         
-          <NavLink
-            to="/about"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-3 hover:bg-gray-100 transition"
-          >
-            About
-          </NavLink>
-          <NavLink
-            to="/contact-us"
-            onClick={() => setMenuOpen(false)}
-            className="block px-6 py-3 hover:bg-gray-100 transition"
-          >
-            Contact
-          </NavLink>
+
           {user?.role === "admin" && (
-            <NavLink to="/dashboard" className="block px-6 py-3 hover:bg-gray-100 transition">
+            <NavLink
+              to="/dashboard"
+              onClick={() => setMenuOpen(false)}
+              className="block px-4 py-3 hover:bg-orange-50 rounded-xl transition-colors font-semibold text-gray-700"
+            >
               Dashboard
             </NavLink>
           )}
 
-          {user ? (
-            <button
-              onClick={handleLogout}
-              className="w-full text-left px-6 py-3 hover:bg-gray-100 transition text-gray-700 font-medium"
-            >
-              Logout
-            </button>
-          ) : (
-            <NavLink
-              to="/login"
-              onClick={() => setMenuOpen(false)}
-              className="block px-6 py-3 bg-orange-600 text-white text-center rounded-lg mx-4 my-2 hover:bg-orange-700 transition font-medium "
-            >
-              Login
-            </NavLink>
-          )}
+          <div className="pt-2 border-t border-gray-100 mt-2">
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-3 text-red-600 font-bold hover:bg-red-50 rounded-xl transition-colors flex items-center gap-3"
+              >
+                <LogOut size={18} />
+                Logout
+              </button>
+            ) : (
+              <NavLink
+                to="/login"
+                onClick={() => setMenuOpen(false)}
+                className="block px-6 py-3 bg-orange-600 text-white text-center rounded-xl hover:bg-orange-700 transition font-bold shadow-lg "
+              >
+                Login
+              </NavLink>
+            )}
+          </div>
         </div>
       )}
     </header>
